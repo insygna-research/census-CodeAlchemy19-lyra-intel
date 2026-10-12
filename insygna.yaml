@@ -34,3 +34,54 @@ tags:
   - "compliance"
   - "healthcare"
   - "python"
+
+# The pod runs every docker-compose service as its own container. Without sizes the platform's
+# default per-pod budget split five ways leaves each container ~51 MiB of memory, which it refuses.
+resources:            # the app container: lyra-intel
+  cpu:
+    request: "250m"
+    limit: "1"
+  memory:
+    request: "512Mi"
+    limit: "1Gi"
+
+runtime:
+  containers:
+    - name: lyra-intel        # sized by the top-level resources block
+      role: app
+    - name: lyra-worker
+      role: auxiliary
+      resources:
+        cpu:
+          request: "250m"
+          limit: "1"
+        memory:
+          request: "512Mi"
+          limit: "1Gi"
+    - name: redis
+      role: auxiliary
+      resources:
+        cpu:
+          request: "50m"
+          limit: "250m"
+        memory:
+          request: "64Mi"
+          limit: "256Mi"
+    - name: postgres
+      role: auxiliary
+      resources:
+        cpu:
+          request: "100m"
+          limit: "500m"
+        memory:
+          request: "256Mi"
+          limit: "512Mi"
+    - name: dashboard
+      role: auxiliary
+      resources:
+        cpu:
+          request: "100m"
+          limit: "500m"
+        memory:
+          request: "256Mi"
+          limit: "512Mi"
